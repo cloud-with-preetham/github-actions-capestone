@@ -303,6 +303,10 @@ Detected vulnerabilities include:
 
 ![Pipeline](docs/pipeline.png)
 
+## Health Check
+
+![Health](docs/health-check.png)
+
 ---
 
 # Future Improvements
