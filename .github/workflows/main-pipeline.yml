@@ -20,7 +20,6 @@ jobs:
       tag: latest
 
     secrets:
-      docker_username: ${{ vars.DOCKER_USERNAME }}
       docker_token: ${{ secrets.DOCKER_TOKEN }}
 
   deploy:

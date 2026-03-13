@@ -1,5 +1,6 @@
 #!/bin/bash
 
-python app.py &
+python app/app.py &
 sleep 5
-curl http://localhost:5000/health
+curl --fail http://localhost:5000/health
+  
