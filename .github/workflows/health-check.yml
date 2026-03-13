@@ -1,0 +1,14 @@
+name: Health Check
+
+on:
+  schedule:
+    - cron: "0 */12 * * *"
+  workflow_dispatch:
+
+jobs:
+  health:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Pull Image
+        run: docker pull dockerhubusername/
