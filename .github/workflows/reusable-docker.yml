@@ -12,7 +12,7 @@ on:
 
     secrets:
       docker_token:
-      required: true
+        required: true
 
 jobs:
   docker:
