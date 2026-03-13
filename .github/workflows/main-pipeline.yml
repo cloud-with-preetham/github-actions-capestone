@@ -1,11 +1,11 @@
-name: Main Pipeline
+name: main-pipeline
 
 on:
   push:
-    branches:
-      - main
+    branches: [ main ]
 
 jobs:
+
   build-test:
     uses: ./.github/workflows/reusable-build-test.yml
     with:
@@ -15,8 +15,9 @@ jobs:
   docker-build:
     needs: build-test
     uses: ./.github/workflows/reusable-docker.yml
+
     with:
-      image_name: github-actions-capestone
+      image_name: github-actions-capstone
       tag: latest
 
     secrets:
@@ -29,5 +30,4 @@ jobs:
 
     steps:
       - name: Deploy
-        run: |
-          echo "Deploying image: ${{ needs.docker-build.outputs.image_url }}"
+        run: echo "Deploying image ${{ needs.docker-build.outputs.image_url }}"
