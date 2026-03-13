@@ -17,7 +17,7 @@ jobs:
     uses: ./.github/workflows/reusable-docker.yml
 
     with:
-      image_name: github-actions-capstone
+      image_name: github-actions-capestone
       tag: latest
 
     secrets:
