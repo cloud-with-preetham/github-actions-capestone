@@ -8,15 +8,23 @@ echo "Pulling latest image..."
 docker pull "$IMAGE"
 
 echo "Starting container..."
-docker run -d -p 5000:5000 --name app-test "$IMAGE"
+docker run -d -p 5000:5000 --name health-test "$IMAGE"
 
-echo "Waiting for container to start..."
-sleep 5
+echo "Waiting for application to start..."
 
-echo "Running health check..."
-curl --fail http://localhost:5000/health
+for i in {1..10}; do
+  if curl --silent --fail http://localhost:5000/health; then
+    echo "Health check passed"
+    docker rm -f health-test
+    exit 0
+  fi
 
-echo "Health check passed"
+  echo "Retrying... ($i)"
+  sleep 3
+done
 
-echo "Stopping container..."
-docker rm -f app-test
+echo "Health check failed"
+docker logs health-test
+
+docker rm -f health-test
+exit 1
