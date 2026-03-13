@@ -24,7 +24,8 @@ jobs:
       - name: Setup python
         uses: actions/setup-python@v6
         with:
-          python_version: ${{ inputs.python_version }}
+          python-version: ${{ inputs.python_version }}
+          cache: 'pip'
 
       - name: Install Dependencies
         run: pip install --no-cache-dir -r app/requirements.txt
