@@ -50,5 +50,12 @@ jobs:
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
+      - name: Scan Docker Image with Trivy
+        uses: aquasecurity/trivy-action@0.35.0
+        with:
+          image-ref: ${{ vars.DOCKER_USERNAME }}/${{ inputs.image_name }}:${{ inputs.tag }}
+          severity: CRITICAL,HIGH
+          exit-code: 1
+
       - name: GitHub Output
         run: echo "url=${{ vars.DOCKER_USERNAME }}/${{ inputs.image_name }}:${{ inputs.tag }}" >> GITHUB_OUTPUT
