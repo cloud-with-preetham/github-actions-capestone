@@ -10,5 +10,21 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Pull Image
-        run: docker pull dockerhubusername/
+      - name: Checkout Repository
+        uses: actions/checkout@v6
+
+      - name: Pull Docker Image
+        run: |
+          docker pull ${{ vars.DOCKER_USERNAME }}/github-actions-capestone:latest
+
+      - name: Run Health Check
+        run: |
+          chmod 764 scripts/health-check.sh
+          DOCKER_USERNAME=${{ vars.DOCKER_USERNAME }} ./scripts/health-check.sh
+
+      - name: Health Check Summary
+        run: |
+          echo "## Health Check Report" >> $GITHUB_STEP_SUMMARY
+          echo "- Image: ${{ vars.DOCKER_USERNAME }}/github-actions-capestone:latest" >> $GITHUB_STEP_SUMMARY
+          echo "- Status: PASSED" >> $GITHUB_STEP_SUMMARY
+          echo "- Time: $(date)" >> $GITHUB_STEP_SUMMARY
