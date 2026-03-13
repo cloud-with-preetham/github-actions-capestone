@@ -31,6 +31,12 @@ jobs:
           username: ${{ vars.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_TOKEN }}
 
+      - name: Debug variables
+        run: |
+          echo "USERNAME=${{ vars.DOCKER_USERNAME }}"
+          echo "IMAGE=${{ inputs.image_name }}"
+          echo "TAG=${{ inputs.tag }}"
+
       - name: Build Docker Image
         run: |
           docker build -t ${{ vars.DOCKER_USERNAME }}/${{ vars.image_name }}:${{ inputs.tag }} -f docker/Dockerfile .
