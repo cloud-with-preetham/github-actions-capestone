@@ -25,6 +25,6 @@ done
 
 echo "Health check failed"
 docker logs health-test
-
 docker rm -f health-test
+
 exit 1
