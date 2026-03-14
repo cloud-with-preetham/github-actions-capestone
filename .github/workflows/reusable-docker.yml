@@ -52,6 +52,7 @@ jobs:
           context: .
           file: docker/Dockerfile.multistage
           push: true
+          platforms: linux/amd64, linux/arm64
           tags: |
             ${{ vars.DOCKER_USERNAME }}/${{ inputs.image_name }}:${{ inputs.tag }}
              ${{ vars.DOCKER_USERNAME }}/${{ inputs.image_name }}:latest
