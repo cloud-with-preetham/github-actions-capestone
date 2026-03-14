@@ -1,42 +1,76 @@
 body {
-  background: #0b1120;
-  color: white;
-  font-family: Arial;
+  background: radial-gradient(circle at top, #020617, #020617, #020617, #000);
+  color: #e2e8f0;
+  font-family: "Segoe UI", sans-serif;
+  margin: 0;
+  padding: 0;
   text-align: center;
 }
 
+/* HEADER */
+
 h1 {
   margin-top: 40px;
+  font-size: 32px;
+  letter-spacing: 1px;
   color: #38bdf8;
 }
+
+/* GRID */
 
 .grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
   gap: 25px;
-  margin: 40px;
+  padding: 40px;
 }
+
+/* CARD */
 
 .card {
-  background: #1e293b;
-  padding: 20px;
-  border-radius: 12px;
-  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.5);
+  background: rgba(30, 41, 59, 0.65);
+  backdrop-filter: blur(10px);
+  border-radius: 14px;
+  padding: 25px;
+  transition: all 0.25s ease;
+  box-shadow:
+    0 0 0 rgba(0, 0, 0, 0),
+    0 15px 40px rgba(0, 0, 0, 0.4);
 }
 
-.card.green {
-  background: #064e3b;
+/* hover */
+
+.card:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 25px 60px rgba(0, 0, 0, 0.7);
 }
+
+/* CARD TITLES */
 
 .card h3 {
   color: #94a3b8;
+  font-size: 14px;
   margin-bottom: 10px;
+  letter-spacing: 1px;
+  text-transform: uppercase;
 }
 
-.status {
-  font-weight: bold;
-  color: #22c55e;
+/* METRIC TEXT */
+
+.card p {
+  font-size: 18px;
+  font-weight: 600;
 }
+
+/* STATUS */
+
+.status {
+  color: #22c55e;
+  font-weight: bold;
+  font-size: 20px;
+}
+
+/* HEALTH */
 
 .health-ok {
   color: #22c55e;
@@ -44,15 +78,46 @@ h1 {
 }
 
 .health-bad {
-  color: red;
+  color: #ef4444;
   font-weight: bold;
 }
 
-canvas {
-  max-height: 150px;
+/* APPLICATION STATUS CARD */
+
+.card.green {
+  background: linear-gradient(
+    135deg,
+    rgba(16, 185, 129, 0.25),
+    rgba(16, 185, 129, 0.05)
+  );
+  border: 1px solid rgba(16, 185, 129, 0.4);
 }
 
+/* CPU / MEM METRICS */
+
+#cpu {
+  color: #38bdf8;
+}
+
+#memory {
+  color: #22c55e;
+}
+
+#requests {
+  color: #f59e0b;
+}
+
+/* CHART AREA */
+
+canvas {
+  height: 140px !important;
+}
+
+/* FOOTER */
+
 footer {
-  margin-top: 40px;
+  margin-top: 20px;
+  padding: 30px;
+  font-size: 14px;
   color: #64748b;
 }
