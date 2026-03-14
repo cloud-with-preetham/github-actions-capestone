@@ -9,7 +9,7 @@
     <script>
       let cpuData = [];
       let memData = [];
-      let requestData = [];
+      let reqData = [];
       let labels = [];
 
       let cpuChart;
@@ -56,7 +56,7 @@
             datasets: [
               {
                 label: "Requests",
-                data: requestData,
+                data: reqData,
                 borderColor: "#f59e0b",
                 tension: 0.4,
               },
@@ -94,13 +94,13 @@
         labels.push(time);
         cpuData.push(data.cpu);
         memData.push(data.memory);
-        requestData.push(data.requests);
+        reqData.push(data.requests);
 
         if (labels.length > 20) {
           labels.shift();
           cpuData.shift();
           memData.shift();
-          requestData.shift();
+          reqData.shift();
         }
 
         cpuChart.update();
@@ -133,7 +133,7 @@
   >
     <div class="header">
       <h1>DevSecOps Control Center</h1>
-      <span class="env-badge">Production</span>
+      <div class="env-badge">Production</div>
     </div>
 
     <section class="hero">
@@ -158,7 +158,7 @@
       </div>
     </section>
 
-    <h3 class="section-title">System Status</h3>
+    <h3 class="section-title">SYSTEM STATUS</h3>
 
     <section class="grid">
       <div class="card">
@@ -182,7 +182,7 @@
       </div>
     </section>
 
-    <h3 class="section-title">System Information</h3>
+    <h3 class="section-title">SYSTEM INFORMATION</h3>
 
     <section class="grid">
       <div class="card">
@@ -211,7 +211,7 @@
       </div>
     </section>
 
-    <h3 class="section-title">Build Information</h3>
+    <h3 class="section-title">BUILD INFORMATION</h3>
 
     <section class="grid">
       <div class="card">
@@ -228,7 +228,7 @@
       </div>
     </section>
 
-    <h3 class="section-title">Monitoring</h3>
+    <h3 class="section-title">MONITORING</h3>
 
     <section class="grid">
       <div class="card chart">
