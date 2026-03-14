@@ -39,3 +39,8 @@ jobs:
           ./tests/test.sh
           echo "status=passed" >> $GITHUB_OUTPUT
 
+      - name: Check Dependencies for Vulnerabilities
+        if: github.event_name == 'pull_request' || github.event_name == 'pull_request_target'
+        uses: actions/dependency-review-action@v4
+        with:
+          fail-on-severity: critical
