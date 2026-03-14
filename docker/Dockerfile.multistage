@@ -1,0 +1,45 @@
+# -------- Stage 1: Builder --------
+FROM python:3.12-slim AS builder
+
+WORKDIR /install
+
+# Environment variables for cleaner builds
+ENV PYTHONDONTWRITEBYTECODE=1
+ENV PYTHONUNBUFFERED=1
+
+# Install dependencies
+COPY app/requirements.txt .
+
+RUN pip install --upgrade pip && \
+    pip install --prefix=/install --no-cache-dir -r requirements.txt
+
+
+# -------- Stage 2: Runtime --------
+FROM python:3.12-slim
+
+WORKDIR /app
+
+ARG BUILD_COMMIT
+ARG BUILD_NUMBER
+ARG IMAGE_TAG
+
+ENV BUILD_COMMIT=$BUILD_COMMIT
+ENV BUILD_NUMBER=$BUILD_NUMBER
+ENV IMAGE_TAG=$IMAGE_TAG
+
+ENV PYTHONDONTWRITEBYTECODE=1
+ENV PYTHONUNBUFFERED=1
+
+# Copy installed dependencies from builder stage
+COPY --from=builder /install /usr/local
+
+# Copy application code
+COPY app/ .
+
+# Create non-root user (DevSecOps best practice)
+RUN adduser --disabled-password appuser
+USER appuser
+
+EXPOSE 5000
+
+CMD ["python", "app.py"]
