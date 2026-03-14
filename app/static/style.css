@@ -1,123 +1,130 @@
 body {
-  background: radial-gradient(circle at top, #020617, #020617, #020617, #000);
+  background: #020617;
   color: #e2e8f0;
-  font-family: "Segoe UI", sans-serif;
+  font-family: Inter, system-ui;
   margin: 0;
-  padding: 0;
-  text-align: center;
 }
 
-/* HEADER */
-
 h1 {
-  margin-top: 40px;
-  font-size: 32px;
-  letter-spacing: 1px;
+  text-align: center;
+  margin: 40px 0;
   color: #38bdf8;
 }
 
-/* GRID */
-
-.grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-  gap: 25px;
-  padding: 40px;
-}
-
-/* CARD */
-
-.card {
-  background: rgba(30, 41, 59, 0.65);
-  backdrop-filter: blur(10px);
-  border-radius: 14px;
-  padding: 25px;
-  transition: all 0.25s ease;
-  box-shadow:
-    0 0 0 rgba(0, 0, 0, 0),
-    0 15px 40px rgba(0, 0, 0, 0.4);
-}
-
-/* hover */
-
-.card:hover {
-  transform: translateY(-6px);
-  box-shadow: 0 25px 60px rgba(0, 0, 0, 0.7);
-}
-
-/* CARD TITLES */
-
-.card h3 {
-  color: #94a3b8;
-  font-size: 14px;
-  margin-bottom: 10px;
-  letter-spacing: 1px;
+.section-title {
+  margin: 40px;
+  font-size: 12px;
+  letter-spacing: 2px;
+  color: #64748b;
   text-transform: uppercase;
 }
 
-/* METRIC TEXT */
+.hero {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: 20px;
+  padding: 0 40px;
+}
+
+.hero-card {
+  background: #0f172a;
+  border: 1px solid #1e293b;
+  padding: 20px;
+  border-radius: 12px;
+  text-align: center;
+}
+
+.hero-card h4 {
+  color: #64748b;
+  font-size: 12px;
+}
+
+.hero-card p {
+  font-size: 28px;
+  font-weight: 700;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 20px;
+  padding: 0 40px;
+}
+
+.card {
+  background: #0f172a;
+  border: 1px solid #1e293b;
+  padding: 24px;
+  border-radius: 14px;
+  transition: 0.2s;
+}
+
+.card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.5);
+}
+
+.card h3 {
+  font-size: 12px;
+  letter-spacing: 2px;
+  color: #64748b;
+  margin-bottom: 10px;
+}
 
 .card p {
   font-size: 18px;
   font-weight: 600;
 }
 
-/* STATUS */
-
-.status {
-  color: #22c55e;
-  font-weight: bold;
-  font-size: 20px;
-}
-
-/* HEALTH */
-
-.health-ok {
-  color: #22c55e;
-  font-weight: bold;
-}
-
-.health-bad {
-  color: #ef4444;
-  font-weight: bold;
-}
-
-/* APPLICATION STATUS CARD */
-
-.card.green {
-  background: linear-gradient(
-    135deg,
-    rgba(16, 185, 129, 0.25),
-    rgba(16, 185, 129, 0.05)
-  );
-  border: 1px solid rgba(16, 185, 129, 0.4);
-}
-
-/* CPU / MEM METRICS */
-
-#cpu {
-  color: #38bdf8;
-}
-
-#memory {
+.status-green {
   color: #22c55e;
 }
 
-#requests {
-  color: #f59e0b;
+.dot {
+  height: 10px;
+  width: 10px;
+  border-radius: 50%;
+  display: inline-block;
+  margin-right: 6px;
 }
 
-/* CHART AREA */
-
-canvas {
-  height: 140px !important;
+.green {
+  background: #22c55e;
+  box-shadow: 0 0 10px #22c55e;
 }
 
-/* FOOTER */
+.red {
+  background: #ef4444;
+  box-shadow: 0 0 10px #ef4444;
+}
+
+.yellow {
+  background: #f59e0b;
+  box-shadow: 0 0 10px #f59e0b;
+}
+
+.chart {
+  height: 220px;
+}
+
+.gauge canvas {
+  height: 160px !important;
+}
+
+.timeline {
+  list-style: none;
+  padding: 0;
+  font-size: 14px;
+  text-align: left;
+  color: #94a3b8;
+}
+
+.timeline li {
+  margin-bottom: 8px;
+}
 
 footer {
-  margin-top: 20px;
-  padding: 30px;
-  font-size: 14px;
+  text-align: center;
+  margin: 40px;
   color: #64748b;
 }

@@ -1,7 +1,7 @@
 <!doctype html>
 <html>
   <head>
-    <title>DevSecOps Dashboard</title>
+    <title>DevSecOps Control Center</title>
 
     <link rel="stylesheet" href="/static/style.css" />
 
@@ -16,6 +16,9 @@
       let cpuChart;
       let memoryChart;
       let requestChart;
+
+      let cpuGauge;
+      let memoryGauge;
 
       function initCharts() {
         cpuChart = new Chart(document.getElementById("cpuChart"), {
@@ -67,9 +70,50 @@
         });
       }
 
+      function initGauges() {
+        cpuGauge = new Chart(document.getElementById("cpuGauge"), {
+          type: "doughnut",
+          data: {
+            datasets: [
+              {
+                data: [0, 100],
+                backgroundColor: ["#38bdf8", "#1e293b"],
+                borderWidth: 0,
+              },
+            ],
+          },
+          options: {
+            cutout: "75%",
+            plugins: { legend: { display: false } },
+          },
+        });
+
+        memoryGauge = new Chart(document.getElementById("memoryGauge"), {
+          type: "doughnut",
+          data: {
+            datasets: [
+              {
+                data: [0, 100],
+                backgroundColor: ["#22c55e", "#1e293b"],
+                borderWidth: 0,
+              },
+            ],
+          },
+          options: {
+            cutout: "75%",
+            plugins: { legend: { display: false } },
+          },
+        });
+      }
+
       async function loadMetrics() {
         let res = await fetch("/metrics");
         let metrics = await res.json();
+
+        document.getElementById("cpu").innerText = metrics.cpu + "%";
+        document.getElementById("memory").innerText = metrics.memory + "%";
+        document.getElementById("requests").innerText = metrics.requests;
+        document.getElementById("uptime").innerText = metrics.uptime + "s";
 
         document.getElementById("hostname").innerText = metrics.hostname;
         document.getElementById("platform").innerText = metrics.platform;
@@ -81,11 +125,14 @@
         document.getElementById("build").innerText = metrics.build;
         document.getElementById("image").innerText = metrics.image;
 
-        document.getElementById("cpu").innerText = metrics.cpu + " %";
-        document.getElementById("memory").innerText = metrics.memory + " %";
-        document.getElementById("uptime").innerText =
-          metrics.uptime + " seconds";
-        document.getElementById("requests").innerText = metrics.requests;
+        cpuGauge.data.datasets[0].data = [metrics.cpu, 100 - metrics.cpu];
+        memoryGauge.data.datasets[0].data = [
+          metrics.memory,
+          100 - metrics.memory,
+        ];
+
+        cpuGauge.update();
+        memoryGauge.update();
 
         updateCharts(metrics);
       }
@@ -100,13 +147,11 @@
         let status = document.getElementById("pipelineStatus");
 
         if (data.conclusion === "success") {
-          status.innerText = "Success";
-          status.style.color = "#22c55e";
+          status.innerHTML = '<span class="dot green"></span>Success';
         } else if (data.conclusion === "failure") {
-          status.innerText = "Failed";
-          status.style.color = "red";
+          status.innerHTML = '<span class="dot red"></span>Failed';
         } else {
-          status.innerText = data.status;
+          status.innerHTML = '<span class="dot yellow"></span>' + data.status;
         }
       }
 
@@ -132,14 +177,13 @@
 
       async function checkHealth() {
         let res = await fetch("/health");
+
         let health = document.getElementById("health");
 
         if (res.ok) {
-          health.innerText = "Healthy";
-          health.className = "health-ok";
+          health.innerHTML = '<span class="dot green"></span>Healthy';
         } else {
-          health.innerText = "Unhealthy";
-          health.className = "health-bad";
+          health.innerHTML = '<span class="dot red"></span>Unhealthy';
         }
       }
 
@@ -152,127 +196,157 @@
   <body
     onload="
       initCharts();
+      initGauges();
       loadMetrics();
       loadPipeline();
       checkHealth();
     "
   >
-    <h1>🚀 DevSecOps CI/CD Dashboard</h1>
+    <h1>🚀 DevSecOps Control Center</h1>
+
+    <div class="hero">
+      <div class="hero-card">
+        <h4>CPU</h4>
+        <p id="cpu"></p>
+      </div>
+
+      <div class="hero-card">
+        <h4>Memory</h4>
+        <p id="memory"></p>
+      </div>
+
+      <div class="hero-card">
+        <h4>Requests</h4>
+        <p id="requests"></p>
+      </div>
+
+      <div class="hero-card">
+        <h4>Uptime</h4>
+        <p id="uptime"></p>
+      </div>
+    </div>
+
+    <div class="section-title">System Status</div>
 
     <div class="grid">
-      <div class="card green">
-        <h3>Application Status</h3>
-        <p class="status">Running</p>
+      <div class="card">
+        <h3>Application</h3>
+        <p class="status-green">Running</p>
       </div>
 
       <div class="card">
-        <h3>Deployment Status</h3>
-        <p id="deployStatus" class="status">Running</p>
+        <h3>Deployment</h3>
+        <p class="status-green">Running</p>
       </div>
 
       <div class="card">
         <h3>Health</h3>
-        <p id="health">Checking...</p>
+        <p id="health"></p>
       </div>
 
       <div class="card">
-        <h3>Pipeline Status</h3>
-        <p id="pipelineStatus">Checking...</p>
+        <h3>Pipeline</h3>
+        <p id="pipelineStatus"></p>
       </div>
+    </div>
 
-      <div class="card">
-        <h3>Last Workflow Run</h3>
-        <p id="pipelineRun"></p>
-      </div>
+    <div class="section-title">System Information</div>
 
-      <div class="card">
-        <h3>Branch</h3>
-        <p id="pipelineBranch"></p>
-      </div>
-
+    <div class="grid">
       <div class="card">
         <h3>Service</h3>
         <p id="service"></p>
       </div>
-
       <div class="card">
         <h3>Environment</h3>
         <p id="env"></p>
       </div>
-
       <div class="card">
         <h3>Hostname</h3>
         <p id="hostname"></p>
       </div>
-
       <div class="card">
         <h3>Platform</h3>
         <p id="platform"></p>
       </div>
-
       <div class="card">
-        <h3>Python Version</h3>
+        <h3>Python</h3>
         <p id="python"></p>
       </div>
-
       <div class="card">
         <h3>Server Time</h3>
         <p id="time"></p>
       </div>
+    </div>
 
+    <div class="section-title">Build Information</div>
+
+    <div class="grid">
       <div class="card">
         <h3>Git Commit</h3>
         <p id="commit"></p>
       </div>
-
       <div class="card">
         <h3>Build Number</h3>
         <p id="build"></p>
       </div>
-
       <div class="card">
         <h3>Docker Image</h3>
         <p id="image"></p>
       </div>
-
       <div class="card">
-        <h3>CPU Usage</h3>
-        <p id="cpu"></p>
+        <h3>Branch</h3>
+        <p id="pipelineBranch"></p>
+      </div>
+      <div class="card">
+        <h3>Workflow Run</h3>
+        <p id="pipelineRun"></p>
+      </div>
+    </div>
+
+    <div class="section-title">Monitoring</div>
+
+    <div class="grid">
+      <div class="card gauge">
+        <h3>CPU Gauge</h3>
+        <canvas id="cpuGauge"></canvas>
       </div>
 
-      <div class="card">
-        <h3>Memory Usage</h3>
-        <p id="memory"></p>
+      <div class="card gauge">
+        <h3>Memory Gauge</h3>
+        <canvas id="memoryGauge"></canvas>
       </div>
 
-      <div class="card">
-        <h3>Container Uptime</h3>
-        <p id="uptime"></p>
-      </div>
-
-      <div class="card">
-        <h3>Total Requests</h3>
-        <p id="requests"></p>
-      </div>
-
-      <div class="card">
-        <h3>CPU Usage Trend</h3>
+      <div class="card chart">
+        <h3>CPU Trend</h3>
         <canvas id="cpuChart"></canvas>
       </div>
 
-      <div class="card">
-        <h3>Memory Usage Trend</h3>
+      <div class="card chart">
+        <h3>Memory Trend</h3>
         <canvas id="memoryChart"></canvas>
       </div>
 
-      <div class="card">
+      <div class="card chart">
         <h3>Requests Trend</h3>
         <canvas id="requestChart"></canvas>
       </div>
     </div>
 
-    <footer>
-      <p>GitHub Actions • Docker • Trivy • AWS EC2 • DevSecOps</p>
-    </footer>
+    <div class="section-title">Deployment Timeline</div>
+
+    <div class="grid">
+      <div class="card">
+        <ul class="timeline">
+          <li>Pipeline triggered</li>
+          <li>Docker image built</li>
+          <li>Security scan (Trivy)</li>
+          <li>Image pushed</li>
+          <li>EC2 deployment</li>
+        </ul>
+      </div>
+    </div>
+
+    <footer>GitHub Actions • Docker • Trivy • AWS EC2 • DevSecOps</footer>
   </body>
 </html>
