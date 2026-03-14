@@ -14,6 +14,11 @@ on:
       docker_token:
         required: true
 
+    outputs:
+      image_url:
+        description: "Docker image URL"
+        value: ${{ jobs.docker.outputs.image_url }}
+
 jobs:
   docker:
     runs-on: ubuntu-latest
@@ -42,6 +47,7 @@ jobs:
 
       - name: Build and Push Docker Image
         uses: docker/build-push-action@v6
+        id: build
         with:
           context: .
           file: docker/Dockerfile
@@ -54,8 +60,10 @@ jobs:
         uses: aquasecurity/trivy-action@0.35.0
         with:
           image-ref: ${{ vars.DOCKER_USERNAME }}/${{ inputs.image_name }}:${{ inputs.tag }}
+          format: table
           severity: CRITICAL
           exit-code: 1
 
-      - name: GitHub Output
-        run: echo "url=${{ vars.DOCKER_USERNAME }}/${{ inputs.image_name }}:${{ inputs.tag }}" >> GITHUB_OUTPUT
+      - name: Set Image Output
+        id: image
+        run: echo "url=${{ vars.DOCKER_USERNAME }}/${{ inputs.image_name }}:${{ inputs.tag }}" >> "$GITHUB_OUTPUT"
