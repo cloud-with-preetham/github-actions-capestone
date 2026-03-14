@@ -1,0 +1,278 @@
+<!doctype html>
+<html>
+  <head>
+    <title>DevSecOps Dashboard</title>
+
+    <link rel="stylesheet" href="/static/style.css" />
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <script>
+      let cpuData = [];
+      let memData = [];
+      let requestData = [];
+      let labels = [];
+
+      let cpuChart;
+      let memoryChart;
+      let requestChart;
+
+      function initCharts() {
+        cpuChart = new Chart(document.getElementById("cpuChart"), {
+          type: "line",
+          data: {
+            labels: labels,
+            datasets: [
+              {
+                label: "CPU %",
+                data: cpuData,
+                borderColor: "#38bdf8",
+                fill: false,
+              },
+            ],
+          },
+          options: { responsive: true },
+        });
+
+        memoryChart = new Chart(document.getElementById("memoryChart"), {
+          type: "line",
+          data: {
+            labels: labels,
+            datasets: [
+              {
+                label: "Memory %",
+                data: memData,
+                borderColor: "#22c55e",
+                fill: false,
+              },
+            ],
+          },
+          options: { responsive: true },
+        });
+
+        requestChart = new Chart(document.getElementById("requestChart"), {
+          type: "line",
+          data: {
+            labels: labels,
+            datasets: [
+              {
+                label: "Requests",
+                data: requestData,
+                borderColor: "#f59e0b",
+                fill: false,
+              },
+            ],
+          },
+          options: { responsive: true },
+        });
+      }
+
+      async function loadMetrics() {
+        let res = await fetch("/metrics");
+        let metrics = await res.json();
+
+        document.getElementById("hostname").innerText = metrics.hostname;
+        document.getElementById("platform").innerText = metrics.platform;
+        document.getElementById("python").innerText = metrics.python;
+        document.getElementById("time").innerText = metrics.time;
+        document.getElementById("service").innerText = metrics.service;
+        document.getElementById("env").innerText = metrics.environment;
+        document.getElementById("commit").innerText = metrics.commit;
+        document.getElementById("build").innerText = metrics.build;
+        document.getElementById("image").innerText = metrics.image;
+
+        document.getElementById("cpu").innerText = metrics.cpu + " %";
+        document.getElementById("memory").innerText = metrics.memory + " %";
+        document.getElementById("uptime").innerText =
+          metrics.uptime + " seconds";
+        document.getElementById("requests").innerText = metrics.requests;
+
+        updateCharts(metrics);
+      }
+
+      async function loadPipeline() {
+        let res = await fetch("/pipeline");
+        let data = await res.json();
+
+        document.getElementById("pipelineRun").innerText = data.run_number;
+        document.getElementById("pipelineBranch").innerText = data.branch;
+
+        let status = document.getElementById("pipelineStatus");
+
+        if (data.conclusion === "success") {
+          status.innerText = "Success";
+          status.style.color = "#22c55e";
+        } else if (data.conclusion === "failure") {
+          status.innerText = "Failed";
+          status.style.color = "red";
+        } else {
+          status.innerText = data.status;
+        }
+      }
+
+      function updateCharts(data) {
+        let time = new Date().toLocaleTimeString();
+
+        labels.push(time);
+        cpuData.push(data.cpu);
+        memData.push(data.memory);
+        requestData.push(data.requests);
+
+        if (labels.length > 20) {
+          labels.shift();
+          cpuData.shift();
+          memData.shift();
+          requestData.shift();
+        }
+
+        cpuChart.update();
+        memoryChart.update();
+        requestChart.update();
+      }
+
+      async function checkHealth() {
+        let res = await fetch("/health");
+        let health = document.getElementById("health");
+
+        if (res.ok) {
+          health.innerText = "Healthy";
+          health.className = "health-ok";
+        } else {
+          health.innerText = "Unhealthy";
+          health.className = "health-bad";
+        }
+      }
+
+      setInterval(loadMetrics, 2000);
+      setInterval(loadPipeline, 5000);
+      setInterval(checkHealth, 5000);
+    </script>
+  </head>
+
+  <body
+    onload="
+      initCharts();
+      loadMetrics();
+      loadPipeline();
+      checkHealth();
+    "
+  >
+    <h1>🚀 DevSecOps CI/CD Dashboard</h1>
+
+    <div class="grid">
+      <div class="card green">
+        <h3>Application Status</h3>
+        <p class="status">Running</p>
+      </div>
+
+      <div class="card">
+        <h3>Deployment Status</h3>
+        <p id="deployStatus" class="status">Running</p>
+      </div>
+
+      <div class="card">
+        <h3>Health</h3>
+        <p id="health">Checking...</p>
+      </div>
+
+      <div class="card">
+        <h3>Pipeline Status</h3>
+        <p id="pipelineStatus">Checking...</p>
+      </div>
+
+      <div class="card">
+        <h3>Last Workflow Run</h3>
+        <p id="pipelineRun"></p>
+      </div>
+
+      <div class="card">
+        <h3>Branch</h3>
+        <p id="pipelineBranch"></p>
+      </div>
+
+      <div class="card">
+        <h3>Service</h3>
+        <p id="service"></p>
+      </div>
+
+      <div class="card">
+        <h3>Environment</h3>
+        <p id="env"></p>
+      </div>
+
+      <div class="card">
+        <h3>Hostname</h3>
+        <p id="hostname"></p>
+      </div>
+
+      <div class="card">
+        <h3>Platform</h3>
+        <p id="platform"></p>
+      </div>
+
+      <div class="card">
+        <h3>Python Version</h3>
+        <p id="python"></p>
+      </div>
+
+      <div class="card">
+        <h3>Server Time</h3>
+        <p id="time"></p>
+      </div>
+
+      <div class="card">
+        <h3>Git Commit</h3>
+        <p id="commit"></p>
+      </div>
+
+      <div class="card">
+        <h3>Build Number</h3>
+        <p id="build"></p>
+      </div>
+
+      <div class="card">
+        <h3>Docker Image</h3>
+        <p id="image"></p>
+      </div>
+
+      <div class="card">
+        <h3>CPU Usage</h3>
+        <p id="cpu"></p>
+      </div>
+
+      <div class="card">
+        <h3>Memory Usage</h3>
+        <p id="memory"></p>
+      </div>
+
+      <div class="card">
+        <h3>Container Uptime</h3>
+        <p id="uptime"></p>
+      </div>
+
+      <div class="card">
+        <h3>Total Requests</h3>
+        <p id="requests"></p>
+      </div>
+
+      <div class="card">
+        <h3>CPU Usage Trend</h3>
+        <canvas id="cpuChart"></canvas>
+      </div>
+
+      <div class="card">
+        <h3>Memory Usage Trend</h3>
+        <canvas id="memoryChart"></canvas>
+      </div>
+
+      <div class="card">
+        <h3>Requests Trend</h3>
+        <canvas id="requestChart"></canvas>
+      </div>
+    </div>
+
+    <footer>
+      <p>GitHub Actions • Docker • Trivy • AWS EC2 • DevSecOps</p>
+    </footer>
+  </body>
+</html>
