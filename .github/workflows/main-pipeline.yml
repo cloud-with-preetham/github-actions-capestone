@@ -22,7 +22,7 @@ jobs:
 
     with:
       image_name: github-actions-capestone
-      tag: latest
+      tag: sha-${{ github.sha }}
 
     secrets:
       docker_token: ${{ secrets.DOCKER_TOKEN }}
@@ -33,5 +33,54 @@ jobs:
     environment: production
 
     steps:
-      - name: Deploy
-        run: echo "Deploying image ${{ needs['docker-build'].outputs.image_url }}"
+      - name: Deploy to EC2
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.EC2_SSH_HOST }}
+          username: ${{ secrets.EC2_SSH_USER }}
+          key: ${{ secrets.EC2_SSH_KEY }}
+          script: |
+
+           script: |
+            IMAGE="${{ vars.DOCKER_USERNAME }}/github-actions-capestone:latest"
+            BACKUP_IMAGE="${{ vars.DOCKER_USERNAME }}/github-actions-capestone:backup"
+
+            echo "Saving current image as backup..."
+            docker tag $IMAGE $BACKUP_IMAGE || true
+
+            echo "Pulling latest image..."
+            docker pull $IMAGE
+
+            echo "Starting new container..."
+            docker run -d -p 5001:5000 --name new-dashboard $IMAGE
+
+            echo "Waiting for container startup..."
+            sleep 10
+
+            echo "Running health check..."
+            if curl --fail http://localhost:5001/health; then
+                echo "New container healthy"
+
+                echo "Stopping old container..."
+                docker rm -f devsecops-dashboard || true
+
+                echo "Starting production container..."
+                docker run -d \
+                -p 80:5000 \
+                --name devsecops-dashboard \
+                --restart always \
+                $IMAGE
+
+                docker rm -f new-dashboard || true
+
+            else
+                echo "Deployment failed — rolling back"
+
+                docker rm -f new-dashboard || true
+
+                docker run -d \
+                -p 80:5000 \
+                --name devsecops-dashboard \
+                --restart always \
+                $BACKUP_IMAGE
+            fi

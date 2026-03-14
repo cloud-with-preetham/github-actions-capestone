@@ -1,0 +1,58 @@
+body {
+  background: #0b1120;
+  color: white;
+  font-family: Arial;
+  text-align: center;
+}
+
+h1 {
+  margin-top: 40px;
+  color: #38bdf8;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 25px;
+  margin: 40px;
+}
+
+.card {
+  background: #1e293b;
+  padding: 20px;
+  border-radius: 12px;
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.5);
+}
+
+.card.green {
+  background: #064e3b;
+}
+
+.card h3 {
+  color: #94a3b8;
+  margin-bottom: 10px;
+}
+
+.status {
+  font-weight: bold;
+  color: #22c55e;
+}
+
+.health-ok {
+  color: #22c55e;
+  font-weight: bold;
+}
+
+.health-bad {
+  color: red;
+  font-weight: bold;
+}
+
+canvas {
+  max-height: 150px;
+}
+
+footer {
+  margin-top: 40px;
+  color: #64748b;
+}
