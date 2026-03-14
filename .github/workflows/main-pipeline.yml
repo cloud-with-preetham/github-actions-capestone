@@ -40,10 +40,8 @@ jobs:
           username: ${{ secrets.EC2_SSH_USER }}
           key: ${{ secrets.EC2_SSH_KEY }}
           script: |
-
-           script: |
-            IMAGE="${{ vars.DOCKER_USERNAME }}/github-actions-capestone:latest"
-            BACKUP_IMAGE="${{ vars.DOCKER_USERNAME }}/github-actions-capestone:backup"
+            IMAGE="h4kops/github-actions-capestone:latest"
+            BACKUP_IMAGE="h4kops/github-actions-capestone:backup"
 
             echo "Saving current image as backup..."
             docker tag $IMAGE $BACKUP_IMAGE || true
