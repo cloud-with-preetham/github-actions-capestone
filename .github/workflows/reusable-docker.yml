@@ -52,7 +52,9 @@ jobs:
           context: .
           file: docker/Dockerfile.multistage
           push: true
-          tags: ${{ vars.DOCKER_USERNAME }}/${{ inputs.image_name }}:${{ inputs.tag }}
+          tags: |
+            ${{ vars.DOCKER_USERNAME }}/${{ inputs.image_name }}:${{ inputs.tag }}
+             ${{ vars.DOCKER_USERNAME }}/${{ inputs.image_name }}:latest
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
