@@ -4,7 +4,6 @@
     <title>DevSecOps Control Center</title>
 
     <link rel="stylesheet" href="/static/style.css" />
-
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
     <script>
@@ -17,9 +16,6 @@
       let memoryChart;
       let requestChart;
 
-      let cpuGauge;
-      let memoryGauge;
-
       function initCharts() {
         cpuChart = new Chart(document.getElementById("cpuChart"), {
           type: "line",
@@ -30,7 +26,7 @@
                 label: "CPU %",
                 data: cpuData,
                 borderColor: "#38bdf8",
-                fill: false,
+                tension: 0.4,
               },
             ],
           },
@@ -46,7 +42,7 @@
                 label: "Memory %",
                 data: memData,
                 borderColor: "#22c55e",
-                fill: false,
+                tension: 0.4,
               },
             ],
           },
@@ -62,7 +58,7 @@
                 label: "Requests",
                 data: requestData,
                 borderColor: "#f59e0b",
-                fill: false,
+                tension: 0.4,
               },
             ],
           },
@@ -70,89 +66,26 @@
         });
       }
 
-      function initGauges() {
-        cpuGauge = new Chart(document.getElementById("cpuGauge"), {
-          type: "doughnut",
-          data: {
-            datasets: [
-              {
-                data: [0, 100],
-                backgroundColor: ["#38bdf8", "#1e293b"],
-                borderWidth: 0,
-              },
-            ],
-          },
-          options: {
-            cutout: "75%",
-            plugins: { legend: { display: false } },
-          },
-        });
-
-        memoryGauge = new Chart(document.getElementById("memoryGauge"), {
-          type: "doughnut",
-          data: {
-            datasets: [
-              {
-                data: [0, 100],
-                backgroundColor: ["#22c55e", "#1e293b"],
-                borderWidth: 0,
-              },
-            ],
-          },
-          options: {
-            cutout: "75%",
-            plugins: { legend: { display: false } },
-          },
-        });
-      }
-
       async function loadMetrics() {
         let res = await fetch("/metrics");
-        let metrics = await res.json();
-
-        document.getElementById("cpu").innerText = metrics.cpu + "%";
-        document.getElementById("memory").innerText = metrics.memory + "%";
-        document.getElementById("requests").innerText = metrics.requests;
-        document.getElementById("uptime").innerText = metrics.uptime + "s";
-
-        document.getElementById("hostname").innerText = metrics.hostname;
-        document.getElementById("platform").innerText = metrics.platform;
-        document.getElementById("python").innerText = metrics.python;
-        document.getElementById("time").innerText = metrics.time;
-        document.getElementById("service").innerText = metrics.service;
-        document.getElementById("env").innerText = metrics.environment;
-        document.getElementById("commit").innerText = metrics.commit;
-        document.getElementById("build").innerText = metrics.build;
-        document.getElementById("image").innerText = metrics.image;
-
-        cpuGauge.data.datasets[0].data = [metrics.cpu, 100 - metrics.cpu];
-        memoryGauge.data.datasets[0].data = [
-          metrics.memory,
-          100 - metrics.memory,
-        ];
-
-        cpuGauge.update();
-        memoryGauge.update();
-
-        updateCharts(metrics);
-      }
-
-      async function loadPipeline() {
-        let res = await fetch("/pipeline");
         let data = await res.json();
 
-        document.getElementById("pipelineRun").innerText = data.run_number;
-        document.getElementById("pipelineBranch").innerText = data.branch;
+        document.getElementById("cpu").innerText = data.cpu + "%";
+        document.getElementById("memory").innerText = data.memory + "%";
+        document.getElementById("requests").innerText = data.requests;
+        document.getElementById("uptime").innerText = data.uptime + "s";
 
-        let status = document.getElementById("pipelineStatus");
+        document.getElementById("hostname").innerText = data.hostname;
+        document.getElementById("platform").innerText = data.platform;
+        document.getElementById("python").innerText = data.python;
+        document.getElementById("time").innerText = data.time;
+        document.getElementById("service").innerText = data.service;
+        document.getElementById("env").innerText = data.environment;
+        document.getElementById("commit").innerText = data.commit;
+        document.getElementById("build").innerText = data.build;
+        document.getElementById("image").innerText = data.image;
 
-        if (data.conclusion === "success") {
-          status.innerHTML = '<span class="dot green"></span>Success';
-        } else if (data.conclusion === "failure") {
-          status.innerHTML = '<span class="dot red"></span>Failed';
-        } else {
-          status.innerHTML = '<span class="dot yellow"></span>' + data.status;
-        }
+        updateCharts(data);
       }
 
       function updateCharts(data) {
@@ -177,7 +110,6 @@
 
       async function checkHealth() {
         let res = await fetch("/health");
-
         let health = document.getElementById("health");
 
         if (res.ok) {
@@ -188,7 +120,6 @@
       }
 
       setInterval(loadMetrics, 2000);
-      setInterval(loadPipeline, 5000);
       setInterval(checkHealth, 5000);
     </script>
   </head>
@@ -196,15 +127,16 @@
   <body
     onload="
       initCharts();
-      initGauges();
       loadMetrics();
-      loadPipeline();
       checkHealth();
     "
   >
-    <h1>🚀 DevSecOps Control Center</h1>
+    <div class="header">
+      <h1>DevSecOps Control Center</h1>
+      <span class="env-badge">Production</span>
+    </div>
 
-    <div class="hero">
+    <section class="hero">
       <div class="hero-card">
         <h4>CPU</h4>
         <p id="cpu"></p>
@@ -224,128 +156,96 @@
         <h4>Uptime</h4>
         <p id="uptime"></p>
       </div>
-    </div>
+    </section>
 
-    <div class="section-title">System Status</div>
+    <h3 class="section-title">System Status</h3>
 
-    <div class="grid">
+    <section class="grid">
       <div class="card">
-        <h3>Application</h3>
+        <h4>Application</h4>
         <p class="status-green">Running</p>
       </div>
 
       <div class="card">
-        <h3>Deployment</h3>
+        <h4>Deployment</h4>
         <p class="status-green">Running</p>
       </div>
 
       <div class="card">
-        <h3>Health</h3>
+        <h4>Health</h4>
         <p id="health"></p>
       </div>
 
       <div class="card">
-        <h3>Pipeline</h3>
-        <p id="pipelineStatus"></p>
+        <h4>Pipeline</h4>
+        <p class="status-green">Success</p>
       </div>
-    </div>
+    </section>
 
-    <div class="section-title">System Information</div>
+    <h3 class="section-title">System Information</h3>
 
-    <div class="grid">
+    <section class="grid">
       <div class="card">
-        <h3>Service</h3>
+        <h4>Service</h4>
         <p id="service"></p>
       </div>
       <div class="card">
-        <h3>Environment</h3>
+        <h4>Environment</h4>
         <p id="env"></p>
       </div>
       <div class="card">
-        <h3>Hostname</h3>
+        <h4>Hostname</h4>
         <p id="hostname"></p>
       </div>
       <div class="card">
-        <h3>Platform</h3>
+        <h4>Platform</h4>
         <p id="platform"></p>
       </div>
       <div class="card">
-        <h3>Python</h3>
+        <h4>Python</h4>
         <p id="python"></p>
       </div>
       <div class="card">
-        <h3>Server Time</h3>
+        <h4>Server Time</h4>
         <p id="time"></p>
       </div>
-    </div>
+    </section>
 
-    <div class="section-title">Build Information</div>
+    <h3 class="section-title">Build Information</h3>
 
-    <div class="grid">
+    <section class="grid">
       <div class="card">
-        <h3>Git Commit</h3>
+        <h4>Git Commit</h4>
         <p id="commit"></p>
       </div>
       <div class="card">
-        <h3>Build Number</h3>
+        <h4>Build Number</h4>
         <p id="build"></p>
       </div>
       <div class="card">
-        <h3>Docker Image</h3>
+        <h4>Docker Image</h4>
         <p id="image"></p>
       </div>
-      <div class="card">
-        <h3>Branch</h3>
-        <p id="pipelineBranch"></p>
-      </div>
-      <div class="card">
-        <h3>Workflow Run</h3>
-        <p id="pipelineRun"></p>
-      </div>
-    </div>
+    </section>
 
-    <div class="section-title">Monitoring</div>
+    <h3 class="section-title">Monitoring</h3>
 
-    <div class="grid">
-      <div class="card gauge">
-        <h3>CPU Gauge</h3>
-        <canvas id="cpuGauge"></canvas>
-      </div>
-
-      <div class="card gauge">
-        <h3>Memory Gauge</h3>
-        <canvas id="memoryGauge"></canvas>
-      </div>
-
+    <section class="grid">
       <div class="card chart">
-        <h3>CPU Trend</h3>
+        <h4>CPU Trend</h4>
         <canvas id="cpuChart"></canvas>
       </div>
 
       <div class="card chart">
-        <h3>Memory Trend</h3>
+        <h4>Memory Trend</h4>
         <canvas id="memoryChart"></canvas>
       </div>
 
       <div class="card chart">
-        <h3>Requests Trend</h3>
+        <h4>Requests Trend</h4>
         <canvas id="requestChart"></canvas>
       </div>
-    </div>
-
-    <div class="section-title">Deployment Timeline</div>
-
-    <div class="grid">
-      <div class="card">
-        <ul class="timeline">
-          <li>Pipeline triggered</li>
-          <li>Docker image built</li>
-          <li>Security scan (Trivy)</li>
-          <li>Image pushed</li>
-          <li>EC2 deployment</li>
-        </ul>
-      </div>
-    </div>
+    </section>
 
     <footer>GitHub Actions • Docker • Trivy • AWS EC2 • DevSecOps</footer>
   </body>
